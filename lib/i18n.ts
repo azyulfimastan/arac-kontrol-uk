@@ -1,0 +1,33 @@
+export type Lang = "tr" | "en";
+export const T = {
+  tr: {
+    banner: "AHMET KULA TARAFINDAN TASARLANMIŞTIR",
+    title: "UK Araç Kontrol", sub: "Plakayı gir, aracın geçmişini ve risk puanını anında gör.",
+    placeholder: "PLAKA: AB12 CDE", check: "Kontrol Et", loading: "Sorgulanıyor…",
+    notFound: "Araç bulunamadı. Plakayı kontrol et.", err: "Bir hata oluştu. Tekrar dene.",
+    demo: "DEMO VERİ: gerçek DVLA/DVSA anahtarları bağlanınca gerçek veri gelir.",
+    risk: "Risk Skoru", low: "Düşük", mid: "Orta", high: "Yüksek",
+    make: "Marka", model: "Model", year: "Yıl", colour: "Renk", fuel: "Yakıt", engine: "Motor (cc)", tax: "Vergi", mot: "MOT", motExp: "MOT bitiş", co2: "CO₂ (g/km)",
+    mileage: "Kilometre Geçmişi", motHistory: "MOT Geçmişi", noTests: "MOT kaydı yok.", passed: "GEÇTİ", failed: "KALDI",
+    save: "Favorilere ekle", saved: "Favoride", pdf: "PDF indir", compare: "Karşılaştır", fav: "Favoriler", hist: "Son aramalar",
+    empty: "Henüz yok.", remove: "Sil", paid: "Ücretli kontrol (finans, çalıntı, write-off)",
+    paidNote: "Bu veriler ücretsiz kaynaklarda yok. Ciddi aday için tek bir ücretli rapor al.",
+    compareTitle: "Karşılaştırma", pick: "Karşılaştırmak için favorilerden en fazla 3 araç seç.", close: "Kapat", lang: "EN",
+    footer: "Veri: DVLA ve DVSA. Risk puanı bir tahmindir, garanti değildir.",
+  },
+  en: {
+    banner: "DESIGNED BY AHMET KULA",
+    title: "UK Car Check", sub: "Enter a plate and see the vehicle history and risk score instantly.",
+    placeholder: "REG: AB12 CDE", check: "Check", loading: "Looking up…",
+    notFound: "Vehicle not found. Check the plate.", err: "Something went wrong. Try again.",
+    demo: "DEMO DATA: real data appears once DVLA/DVSA keys are connected.",
+    risk: "Risk Score", low: "Low", mid: "Medium", high: "High",
+    make: "Make", model: "Model", year: "Year", colour: "Colour", fuel: "Fuel", engine: "Engine (cc)", tax: "Tax", mot: "MOT", motExp: "MOT expiry", co2: "CO₂ (g/km)",
+    mileage: "Mileage History", motHistory: "MOT History", noTests: "No MOT records.", passed: "PASSED", failed: "FAILED",
+    save: "Add to favourites", saved: "Saved", pdf: "Download PDF", compare: "Compare", fav: "Favourites", hist: "Recent searches",
+    empty: "Nothing yet.", remove: "Remove", paid: "Paid check (finance, stolen, write-off)",
+    paidNote: "This data is not in free sources. Buy one paid report for a serious candidate.",
+    compareTitle: "Comparison", pick: "Pick up to 3 favourites to compare.", close: "Close", lang: "TR",
+    footer: "Data: DVLA and DVSA. The risk score is an estimate, not a guarantee.",
+  },
+} as const;

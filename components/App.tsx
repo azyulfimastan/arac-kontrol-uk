@@ -1,0 +1,167 @@
+"use client";
+import { useEffect, useMemo, useState } from "react";
+import { T, Lang } from "@/lib/i18n";
+import { computeRisk } from "@/lib/risk";
+import type { Vehicle } from "@/lib/types";
+import MileageChart from "./MileageChart";
+
+const PAID = [
+  { n: "HPI Check", u: "https://www.hpicheck.com/" },
+  { n: "RAC Vehicle Check", u: "https://www.rac.co.uk/buying-a-car/rac-car-data-check" },
+  { n: "Total Car Check", u: "https://totalcarcheck.co.uk/" },
+  { n: "Check Car Details", u: "https://www.checkcardetails.co.uk/" },
+];
+
+function load<X>(k: string, d: X): X { try { const v = localStorage.getItem(k); return v ? (JSON.parse(v) as X) : d; } catch { return d; } }
+function save(k: string, v: unknown) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+
+export default function App() {
+  const [lang, setLang] = useState<Lang>("tr");
+  const [reg, setReg] = useState("");
+  const [v, setV] = useState<Vehicle | null>(null);
+  const [state, setState] = useState<"idle" | "loading" | "notfound" | "error">("idle");
+  const [favs, setFavs] = useState<Vehicle[]>([]);
+  const [hist, setHist] = useState<string[]>([]);
+  const [sel, setSel] = useState<string[]>([]);
+  const [showCmp, setShowCmp] = useState(false);
+  const t = T[lang];
+
+  useEffect(() => { setFavs(load("ak_favs", [])); setHist(load("ak_hist", [])); setLang(load("ak_lang", "tr")); }, []);
+
+  async function run(r: string) {
+    const q = r.toUpperCase().replace(/[^A-Z0-9]/g, "");
+    if (q.length < 2) return;
+    setState("loading"); setV(null);
+    try {
+      const res = await fetch(`/api/vehicle?reg=${q}`);
+      if (res.status === 404) return setState("notfound");
+      if (!res.ok) return setState("error");
+      const data: Vehicle = await res.json();
+      setV(data); setState("idle"); setReg(q);
+      const h = [q, ...hist.filter((x) => x !== q)].slice(0, 8); setHist(h); save("ak_hist", h);
+    } catch { setState("error"); }
+  }
+
+  const risk = useMemo(() => (v ? computeRisk(v) : null), [v]);
+  const isFav = !!v && favs.some((f) => f.reg === v.reg);
+  const toggleFav = () => { if (!v) return; const n = isFav ? favs.filter((f) => f.reg !== v.reg) : [v, ...favs]; setFavs(n); save("ak_favs", n); };
+  const delFav = (r: string) => { const n = favs.filter((f) => f.reg !== r); setFavs(n); save("ak_favs", n); setSel(sel.filter((s) => s !== r)); };
+  const toggleSel = (r: string) => setSel((s) => (s.includes(r) ? s.filter((x) => x !== r) : s.length < 3 ? [...s, r] : s));
+  const switchLang = () => { const l = lang === "tr" ? "en" : "tr"; setLang(l); save("ak_lang", l); };
+  const lvl = risk ? t[risk.level] : "";
+  const cmp = favs.filter((f) => sel.includes(f.reg));
+
+  return (
+    <>
+      <header className="banner"><div className="bannerText">{t.banner}</div></header>
+      <main className="wrap">
+        <div className="top"><h1>{t.title}</h1><button className="ghost" onClick={switchLang}>{t.lang}</button></div>
+        <p className="sub">{t.sub}</p>
+
+        <form className="search" onSubmit={(e) => { e.preventDefault(); run(reg); }}>
+          <input value={reg} onChange={(e) => setReg(e.target.value.toUpperCase())} placeholder={t.placeholder} maxLength={9} inputMode="text" autoCapitalize="characters" aria-label="registration" />
+          <button type="submit" disabled={state === "loading"}>{state === "loading" ? t.loading : t.check}</button>
+        </form>
+
+        {hist.length > 0 && !v && (
+          <div className="chips"><span className="lbl">{t.hist}:</span>{hist.map((h) => <button key={h} className="chip" onClick={() => run(h)}>{h}</button>)}</div>
+        )}
+
+        {state === "notfound" && <p className="msg bad">{t.notFound}</p>}
+        {state === "error" && <p className="msg bad">{t.err}</p>}
+
+        {v && risk && (
+          <section className="card" id="report">
+            {v.demo && <p className="demo">{t.demo}</p>}
+            <div className="head">
+              <div className="plate">{v.reg}</div>
+              <div className="title">{v.make} {v.model} {v.year ?? ""}</div>
+            </div>
+
+            <div className={`risk ${risk.level}`}>
+              <div className="score">{risk.score}<small>/100</small></div>
+              <div><div className="rl">{t.risk}</div><div className="rv">{lvl}</div></div>
+            </div>
+            <ul className="flags">
+              {risk.flags.map((f) => <li key={f.key} className={f.sev}>{lang === "tr" ? f.tr : f.en}</li>)}
+            </ul>
+
+            <div className="grid">
+              <Info k={t.make} v={v.make} /><Info k={t.model} v={v.model} /><Info k={t.year} v={v.year} /><Info k={t.colour} v={v.colour} />
+              <Info k={t.fuel} v={v.fuel} /><Info k={t.engine} v={v.engineCc} /><Info k={t.tax} v={v.taxStatus} /><Info k={t.mot} v={v.motStatus} />
+              <Info k={t.motExp} v={v.motExpiry} /><Info k={t.co2} v={v.co2} />
+            </div>
+
+            <div className="actions noprint">
+              <button onClick={toggleFav}>{isFav ? "★ " + t.saved : "☆ " + t.save}</button>
+              <button className="ghost" onClick={() => window.print()}>⬇ {t.pdf}</button>
+            </div>
+
+            <h3>{t.mileage}</h3>
+            <MileageChart tests={v.tests} />
+
+            <h3>{t.motHistory}</h3>
+            {v.tests.length === 0 && <p className="muted">{t.noTests}</p>}
+            <ul className="tests">
+              {[...v.tests].sort((a, b) => b.date.localeCompare(a.date)).map((x, i) => (
+                <li key={i}>
+                  <div className="row"><b>{x.date}</b><span className={/fail/i.test(x.result) ? "tag bad" : "tag ok"}>{/fail/i.test(x.result) ? t.failed : t.passed}</span><span className="muted">{x.mileage != null ? `${x.mileage.toLocaleString("en-GB")} ${x.unit}` : "-"}</span></div>
+                  {x.defects.length > 0 && <ul className="def">{x.defects.map((d, j) => <li key={j}><i>{d.type}</i> {d.text}</li>)}</ul>}
+                </li>
+              ))}
+            </ul>
+
+            <div className="paid noprint">
+              <h3>{t.paid}</h3>
+              <p className="muted">{t.paidNote}</p>
+              <div className="chips">{PAID.map((p) => <a key={p.n} className="chip link" href={p.u} target="_blank" rel="noopener noreferrer">{p.n} ↗</a>)}</div>
+            </div>
+          </section>
+        )}
+
+        <section className="card noprint">
+          <h3>{t.fav}</h3>
+          {favs.length === 0 ? <p className="muted">{t.empty}</p> : (
+            <>
+              <ul className="favs">
+                {favs.map((f) => (
+                  <li key={f.reg}>
+                    <label><input type="checkbox" checked={sel.includes(f.reg)} onChange={() => toggleSel(f.reg)} /> <b>{f.reg}</b> <span className="muted">{f.make} {f.model}</span></label>
+                    <span className="fa"><button className="mini" onClick={() => { setReg(f.reg); setV(f); setState("idle"); }}>↗</button><button className="mini ghost" onClick={() => delFav(f.reg)} aria-label={t.remove}>✕</button></span>
+                  </li>
+                ))}
+              </ul>
+              <button disabled={sel.length < 2} onClick={() => setShowCmp(true)}>{t.compare} ({sel.length}/3)</button>
+              {sel.length < 2 && <p className="muted small">{t.pick}</p>}
+            </>
+          )}
+        </section>
+        <footer className="foot">{t.footer}</footer>
+      </main>
+
+      {showCmp && (
+        <div className="modal" onClick={() => setShowCmp(false)}>
+          <div className="sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="top"><h3>{t.compareTitle}</h3><button className="ghost" onClick={() => setShowCmp(false)}>{t.close}</button></div>
+            <div className="tw"><table>
+              <thead><tr><th></th>{cmp.map((c) => <th key={c.reg}>{c.reg}</th>)}</tr></thead>
+              <tbody>
+                {[
+                  [t.risk, (c: Vehicle) => `${computeRisk(c).score}/100`], [t.make, (c: Vehicle) => c.make], [t.model, (c: Vehicle) => c.model],
+                  [t.year, (c: Vehicle) => c.year ?? "-"], [t.fuel, (c: Vehicle) => c.fuel], [t.tax, (c: Vehicle) => c.taxStatus], [t.mot, (c: Vehicle) => c.motStatus],
+                  [t.mileage, (c: Vehicle) => { const m = c.tests.filter((x) => x.mileage != null).sort((a, b) => b.date.localeCompare(a.date))[0]; return m ? `${m.mileage!.toLocaleString("en-GB")} ${m.unit}` : "-"; }],
+                ].map(([label, fn]) => (
+                  <tr key={label as string}><td>{label as string}</td>{cmp.map((c) => <td key={c.reg}>{(fn as (c: Vehicle) => string)(c)}</td>)}</tr>
+                ))}
+              </tbody>
+            </table></div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function Info({ k, v }: { k: string; v: string | number | null }) {
+  return <div className="info"><span>{k}</span><b>{v ?? "-"}</b></div>;
+}
