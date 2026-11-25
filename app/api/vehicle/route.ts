@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
   if (reg.length < 2 || reg.length > 8) return NextResponse.json({ error: "invalid_reg" }, { status: 400 });
 
   const dvlaKey = process.env.DVLA_API_KEY;
-  if (!dvlaKey) return NextResponse.json(demoVehicle(reg));
+  if (!dvlaKey || req.nextUrl.searchParams.get("sample") === "1") return NextResponse.json(demoVehicle(reg));
 
   try {
     const d = await fetch("https://driver-vehicle-licensing.api.gov.uk/vehicle-enquiry/v1/vehicles", {

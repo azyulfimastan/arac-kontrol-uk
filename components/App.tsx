@@ -15,7 +15,7 @@ const PAID = [
 function load<X>(k: string, d: X): X { try { const v = localStorage.getItem(k); return v ? (JSON.parse(v) as X) : d; } catch { return d; } }
 function save(k: string, v: unknown) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
 
-export default function App() {
+export default function App({ sample = false }: { sample?: boolean }) {
   const [lang, setLang] = useState<Lang>("tr");
   const [reg, setReg] = useState("");
   const [v, setV] = useState<Vehicle | null>(null);
@@ -28,12 +28,14 @@ export default function App() {
 
   useEffect(() => { setFavs(load("ak_favs", [])); setHist(load("ak_hist", [])); setLang(load("ak_lang", "tr")); }, []);
 
+  useEffect(() => { if (sample) run("AB12CDE"); /* eslint-disable-next-line */ }, [sample]);
+
   async function run(r: string) {
     const q = r.toUpperCase().replace(/[^A-Z0-9]/g, "");
     if (q.length < 2) return;
     setState("loading"); setV(null);
     try {
-      const res = await fetch(`/api/vehicle?reg=${q}`);
+      const res = await fetch(`/api/vehicle?reg=${q}${sample ? "&sample=1" : ""}`);
       if (res.status === 404) return setState("notfound");
       if (!res.ok) return setState("error");
       const data: Vehicle = await res.json();
@@ -54,9 +56,12 @@ export default function App() {
   return (
     <>
       <header className="banner"><div className="bannerText">{t.banner}</div></header>
+      <nav className="nav noprint">
+        <a href="/">{t.nav[0]}</a><a href="/ornek">{t.nav[1]}</a><a href="/#garaj">{t.nav[2]}</a><a href="/#sss">{t.nav[3]}</a>
+      </nav>
       <main className="wrap">
         <div className="top"><h1>{t.title}</h1><button className="ghost" onClick={switchLang}>{t.lang}</button></div>
-        <p className="sub">{t.sub}</p>
+        <p className="sub">{sample ? t.sampleNote : t.sub}</p>
 
         <form className="search" onSubmit={(e) => { e.preventDefault(); run(reg); }}>
           <input value={reg} onChange={(e) => setReg(e.target.value.toUpperCase())} placeholder={t.placeholder} maxLength={9} inputMode="text" autoCapitalize="characters" aria-label="registration" />
@@ -130,7 +135,27 @@ export default function App() {
           </section>
         )}
 
-        <section className="card noprint">
+        {!v && !sample && state !== "loading" && (
+          <>
+            <section className="card noprint">
+              <h3>{t.freeTitle}</h3>
+              <ul className="ticks">{t.freeList.map((x) => <li key={x}>{x}</li>)}</ul>
+            </section>
+            <section className="card noprint">
+              <h3>{t.howTitle}</h3>
+              <div className="steps">{t.how.map(([a, b]) => <div key={a} className="step"><b>{a}</b><span className="muted">{b}</span></div>)}</div>
+            </section>
+            <section className="card noprint">
+              <h3>{t.fullTitle}</h3>
+              <p className="muted">{t.fullText}</p>
+              <ul className="ticks lock">{t.fullList.map((x) => <li key={x}>{x}</li>)}</ul>
+              <div className="chips">{PAID.map((p) => <a key={p.n} className="chip link" href={p.u} target="_blank" rel="noopener noreferrer">{p.n} ↗</a>)}</div>
+              <p><a className="chip link" href="/ornek">{t.nav[1]} →</a></p>
+            </section>
+          </>
+        )}
+
+        <section className="card noprint" id="garaj">
           <h3>{t.fav}</h3>
           {favs.length === 0 ? <p className="muted">{t.empty}</p> : (
             <>
@@ -147,7 +172,7 @@ export default function App() {
             </>
           )}
         </section>
-        <section className="card noprint">
+        <section className="card noprint" id="sss">
           <h3>{t.sources}</h3>
           <p className="muted">{t.sourcesText}</p>
           <h3>{t.faq}</h3>
