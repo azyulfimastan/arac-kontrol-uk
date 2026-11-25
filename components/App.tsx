@@ -4,12 +4,12 @@ import { T, Lang } from "@/lib/i18n";
 import { computeRisk } from "@/lib/risk";
 import type { Vehicle } from "@/lib/types";
 import MileageChart from "./MileageChart";
+import { countdown, countdownText, ulez, ulezText } from "@/lib/extras";
 
 const PAID = [
   { n: "HPI Check", u: "https://www.hpicheck.com/" },
   { n: "RAC Vehicle Check", u: "https://www.rac.co.uk/buying-a-car/rac-car-data-check" },
   { n: "Total Car Check", u: "https://totalcarcheck.co.uk/" },
-  { n: "Check Car Details", u: "https://www.checkcardetails.co.uk/" },
 ];
 
 function load<X>(k: string, d: X): X { try { const v = localStorage.getItem(k); return v ? (JSON.parse(v) as X) : d; } catch { return d; } }
@@ -86,10 +86,21 @@ export default function App() {
               {risk.flags.map((f) => <li key={f.key} className={f.sev}>{lang === "tr" ? f.tr : f.en}</li>)}
             </ul>
 
+            <h3>{t.dates}</h3>
+            <div className="cd">
+              {([[t.motLeft, v.motExpiry], [t.taxLeft, v.taxDue]] as const).map(([k, d]) => {
+                const c = countdown(d);
+                return <div key={k} className={`cdBox ${c.sev}`}><span>{k}</span><b>{countdownText(c, lang)}</b><small>{d ?? "-"}</small></div>;
+              })}
+              {(() => { const u = ulez(v); const sev = u.status === "yes" || u.status === "likely" ? "ok" : u.status === "unknown" ? "na" : "bad";
+                return <div className={`cdBox ${sev}`}><span>{t.ulez}</span><b>{ulezText(u, lang)}</b><small>{u.basis}</small></div>; })()}
+            </div>
+            <p className="muted small">{t.ulezNote}</p>
+
             <div className="grid">
               <Info k={t.make} v={v.make} /><Info k={t.model} v={v.model} /><Info k={t.year} v={v.year} /><Info k={t.colour} v={v.colour} />
               <Info k={t.fuel} v={v.fuel} /><Info k={t.engine} v={v.engineCc} /><Info k={t.tax} v={v.taxStatus} /><Info k={t.mot} v={v.motStatus} />
-              <Info k={t.motExp} v={v.motExpiry} /><Info k={t.co2} v={v.co2} />
+              <Info k={t.motExp} v={v.motExpiry} /><Info k={t.taxDue} v={v.taxDue} /><Info k={t.co2} v={v.co2} />
             </div>
 
             <div className="actions noprint">
@@ -135,6 +146,14 @@ export default function App() {
               {sel.length < 2 && <p className="muted small">{t.pick}</p>}
             </>
           )}
+        </section>
+        <section className="card noprint">
+          <h3>{t.sources}</h3>
+          <p className="muted">{t.sourcesText}</p>
+          <h3>{t.faq}</h3>
+          {t.faqs.map(([q, a]) => (
+            <details key={q} className="faq"><summary>{q}</summary><p className="muted">{a}</p></details>
+          ))}
         </section>
         <footer className="foot">{t.footer}</footer>
       </main>

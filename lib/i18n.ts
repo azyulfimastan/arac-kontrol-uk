@@ -13,6 +13,16 @@ export const T = {
     empty: "Henüz yok.", remove: "Sil", paid: "Ücretli kontrol (finans, çalıntı, write-off)",
     paidNote: "Bu veriler ücretsiz kaynaklarda yok. Ciddi aday için tek bir ücretli rapor al.",
     compareTitle: "Karşılaştırma", pick: "Karşılaştırmak için favorilerden en fazla 3 araç seç.", close: "Kapat", lang: "EN",
+    dates: "Tarihler ve Uyum", motLeft: "MOT", taxLeft: "Vergi", taxDue: "Vergi bitiş", ulez: "ULEZ (Londra)", ulezNote: "Petrolde Euro 4+, dizelde Euro 6+ gerekir. Euro verisi yoksa yıla göre tahmin.",
+    sources: "Veriler nereden geliyor?", sourcesText: "Araç bilgisi DVLA'dan, MOT ve kilometre geçmişi DVSA'dan gelir. İkisi de İngiltere hükümetinin resmi kaynaklarıdır. Sorgun kaydedilmez; favoriler sadece senin cihazında tutulur.",
+    faq: "Sık Sorulan Sorular",
+    faqs: [
+      ["Bu kontrol ücretsiz mi?", "Evet. Resmi DVLA ve DVSA verileri ücretsizdir, burada da ücretsiz."],
+      ["Risk skoru nasıl hesaplanıyor?", "Kilometre tutarsızlığı, MOT kalma oranı, tekrar eden kusurlar, vergi/MOT durumu ve yaşa göre puan verilir. Bir tahmindir, garanti değildir."],
+      ["Çalıntı, finans ve hasar kaydı neden yok?", "Bu veriler ücretsiz resmi kaynaklarda yoktur. Ciddi bir aday için tek bir ücretli rapor al."],
+      ["ULEZ sonucu kesin mi?", "DVLA Euro standardını veriyorsa kesindir. Vermiyorsa üretim yılına göre tahmin edilir; TfL'nin kendi kontrolüyle doğrula."],
+      ["Verilerim saklanıyor mu?", "Hayır. Son aramalar ve favoriler sadece tarayıcında durur."],
+    ],
     footer: "Veri: DVLA ve DVSA. Risk puanı bir tahmindir, garanti değildir.",
   },
   en: {
@@ -28,6 +38,16 @@ export const T = {
     empty: "Nothing yet.", remove: "Remove", paid: "Paid check (finance, stolen, write-off)",
     paidNote: "This data is not in free sources. Buy one paid report for a serious candidate.",
     compareTitle: "Comparison", pick: "Pick up to 3 favourites to compare.", close: "Close", lang: "TR",
+    dates: "Dates & Compliance", motLeft: "MOT", taxLeft: "Tax", taxDue: "Tax due", ulez: "ULEZ (London)", ulezNote: "Petrol needs Euro 4+, diesel Euro 6+. Estimated from year if Euro data is missing.",
+    sources: "Where does the data come from?", sourcesText: "Vehicle details come from the DVLA, MOT and mileage history from the DVSA. Both are official UK government sources. Your search is not stored; favourites stay on your device only.",
+    faq: "Frequently Asked Questions",
+    faqs: [
+      ["Is this check free?", "Yes. Official DVLA and DVSA data is free, and so is this check."],
+      ["How is the risk score calculated?", "It scores mileage inconsistencies, MOT failure rate, repeated defects, tax/MOT status and age. It is an estimate, not a guarantee."],
+      ["Why no stolen, finance or write-off data?", "That data is not in free official sources. Buy one paid report for a serious candidate."],
+      ["Is the ULEZ result exact?", "Exact when the DVLA gives the Euro standard. Otherwise estimated from the year; confirm with TfL's own checker."],
+      ["Is my data stored?", "No. Recent searches and favourites stay in your browser only."],
+    ],
     footer: "Data: DVLA and DVSA. The risk score is an estimate, not a guarantee.",
   },
 } as const;

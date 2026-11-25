@@ -28,7 +28,7 @@ export function demoVehicle(reg: string): Vehicle {
   }
   return {
     reg, make, model, colour: colours[h % colours.length], fuel: fuels[h % fuels.length], engineCc: [998, 1242, 1598, 1995][h % 4],
-    year, co2: 90 + (h % 80), taxStatus: "Taxed", taxDue: `${now.getFullYear() + 1}-03-01`, motStatus: "Valid", motExpiry: `${now.getFullYear() + 1}-01-14`,
+    year, co2: 90 + (h % 80), taxStatus: "Taxed", taxDue: new Date(now.getTime() + (12 + (h % 60)) * 86400000).toISOString().slice(0, 10), motStatus: "Valid", motExpiry: new Date(now.getTime() + (20 + (h % 200)) * 86400000).toISOString().slice(0, 10), euroStatus: null,
     tests, demo: true,
   };
 }

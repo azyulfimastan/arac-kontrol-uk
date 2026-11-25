@@ -57,3 +57,12 @@ th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;overfl
   .card{background:#fff;border:1px solid #999;color:#000}.info,.flags li,.risk{background:#fff;color:#000}
   .muted,.def,.info span{color:#444}.chart{background:#fff}
 }
+.cd{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cdBox{background:#0e1424;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:2px;min-width:0;border-left:4px solid var(--line)}
+.cdBox span{color:var(--muted);font-size:12px}.cdBox b{font-size:15px;overflow-wrap:anywhere}.cdBox small{color:var(--muted);font-size:11px;overflow-wrap:anywhere}
+.cdBox.ok{border-left-color:var(--ok)}.cdBox.warn{border-left-color:var(--warn)}.cdBox.bad{border-left-color:var(--bad)}
+.cdBox.ok b{color:var(--ok)}.cdBox.warn b{color:var(--warn)}.cdBox.bad b{color:var(--bad)}
+@media(max-width:480px){.cd{grid-template-columns:1fr 1fr}.cd .cdBox:last-child{grid-column:1/-1}}
+.faq{border-bottom:1px solid var(--line);padding:10px 0}.faq summary{cursor:pointer;font-weight:700;list-style:none;display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.faq summary::-webkit-details-marker{display:none}
+.faq summary:after{content:"+";flex-shrink:0;color:var(--accent);font-weight:900}.faq[open] summary:after{content:"−"}.faq p{margin:8px 0 0}
+@media print{.cdBox{background:#fff;color:#000}}
