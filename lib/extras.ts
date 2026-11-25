@@ -65,3 +65,20 @@ export function yearlyMileage(v: Vehicle): number | null {
 }
 
 export const RECALL_URL = "https://www.gov.uk/check-vehicle-recall";
+
+export const TFL_URL = "https://tfl.gov.uk/modes/driving/ulez-vrm-checker";
+export const TAX_RATES_URL = "https://www.gov.uk/vehicle-tax-rate-tables";
+
+/** Old CO2-based VED band (cars first registered 1 Mar 2001 - 31 Mar 2017). Rates change every year, so we show the band only. */
+export function taxBand(v: Vehicle): { kind: "band"; band: string } | { kind: "flat" } | { kind: "unknown" } {
+  const m = (v.firstReg || "").match(/^(\d{4})-(\d{2})/);
+  if (!m) return { kind: "unknown" };
+  const ym = Number(m[1]) * 100 + Number(m[2]);
+  if (ym >= 201704) return { kind: "flat" };
+  if (ym < 200103) return { kind: "unknown" };
+  const fuel = (v.fuel || "").toUpperCase();
+  if (v.co2 == null) return /^ELECTRIC/.test(fuel) ? { kind: "band", band: "A" } : { kind: "unknown" };
+  const limits: [number, string][] = [[100, "A"], [110, "B"], [120, "C"], [130, "D"], [140, "E"], [150, "F"], [165, "G"], [175, "H"], [185, "I"], [200, "J"], [225, "K"], [255, "L"]];
+  for (const [max, b] of limits) if (v.co2 <= max) return { kind: "band", band: b };
+  return { kind: "band", band: "M" };
+}

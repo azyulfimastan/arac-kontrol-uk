@@ -3,8 +3,9 @@ import { useEffect, useMemo, useState } from "react";
 import { T, Lang } from "@/lib/i18n";
 import { computeRisk } from "@/lib/risk";
 import type { Vehicle } from "@/lib/types";
+import { Home, FileText, Car, ClipboardCheck, HelpCircle, Gauge, ShieldCheck, Leaf } from "lucide-react";
 import MileageChart from "./MileageChart";
-import { countdown, countdownText, ulez, ulezText, yearlyMileage, RECALL_URL } from "@/lib/extras";
+import { countdown, countdownText, ulez, ulezText, yearlyMileage, taxBand, RECALL_URL, TFL_URL, TAX_RATES_URL } from "@/lib/extras";
 
 const PAID = [
   { n: "HPI Check", u: "https://www.hpicheck.com/" },
@@ -15,7 +16,7 @@ const PAID = [
 function load<X>(k: string, d: X): X { try { const v = localStorage.getItem(k); return v ? (JSON.parse(v) as X) : d; } catch { return d; } }
 function save(k: string, v: unknown) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
 
-export default function App({ sample = false }: { sample?: boolean }) {
+export default function App({ sample = false, motOnly = false }: { sample?: boolean; motOnly?: boolean }) {
   const [lang, setLang] = useState<Lang>("tr");
   const [reg, setReg] = useState("");
   const [v, setV] = useState<Vehicle | null>(null);
@@ -57,11 +58,11 @@ export default function App({ sample = false }: { sample?: boolean }) {
     <>
       <header className="banner"><div className="bannerText">{t.banner}</div></header>
       <nav className="nav noprint">
-        <a href="/">{t.nav[0]}</a><a href="/ornek">{t.nav[1]}</a><a href="/#garaj">{t.nav[2]}</a><a href="/#sss">{t.nav[3]}</a>
+        <a href="/"><Home size={16} />{t.nav[0]}</a><a href="/ornek"><FileText size={16} />{t.nav[1]}</a><a href="/#garaj"><Car size={16} />{t.nav[2]}</a><a href="/mot"><ClipboardCheck size={16} />{t.more[0]}</a><a href="/#sss"><HelpCircle size={16} />{t.nav[3]}</a>
       </nav>
       <main className="wrap">
-        <div className="top"><h1>{t.title}</h1><button className="ghost" onClick={switchLang}>{t.lang}</button></div>
-        <p className="sub">{sample ? t.sampleNote : t.sub}</p>
+        <div className="top"><h1>{motOnly ? t.motPageTitle : t.title}</h1><button className="ghost" onClick={switchLang}>{t.lang}</button></div>
+        <p className="sub">{sample ? t.sampleNote : motOnly ? t.motPageSub : t.sub}</p>
 
         <form className="search" onSubmit={(e) => { e.preventDefault(); run(reg); }}>
           <input value={reg} onChange={(e) => setReg(e.target.value.toUpperCase())} placeholder={t.placeholder} maxLength={9} inputMode="text" autoCapitalize="characters" aria-label="registration" />
@@ -75,7 +76,21 @@ export default function App({ sample = false }: { sample?: boolean }) {
         {state === "notfound" && <p className="msg bad">{t.notFound}</p>}
         {state === "error" && <p className="msg bad">{t.err}</p>}
 
-        {v && risk && (
+        {v && risk && motOnly && (
+          <section className="card" id="report">
+            {v.demo && <p className="demo">{t.demo}</p>}
+            <div className="head"><div className="plate">{v.reg}</div><div className="title">{v.make} {v.model} {v.year ?? ""}</div></div>
+            <div className="cd cd2" style={{ marginTop: 14 }}>
+              {(() => { const c = countdown(v.motExpiry); return <div className={`cdBox ${c.sev}`}><span>{t.motLeft}</span><b>{countdownText(c, lang)}</b><small>{v.motExpiry ?? "-"}</small></div>; })()}
+              <div className="cdBox na"><span>{t.mot}</span><b>{v.motStatus || "-"}</b></div>
+            </div>
+            <h3>{t.mileage}</h3>
+            <MileageChart tests={v.tests} />
+            <MotHistory v={v} t={t} />
+          </section>
+        )}
+
+        {v && risk && !motOnly && (
           <section className="card" id="report">
             {v.demo && <p className="demo">{t.demo}</p>}
             <div className="head">
@@ -101,6 +116,13 @@ export default function App({ sample = false }: { sample?: boolean }) {
                 return <div className={`cdBox ${sev}`}><span>{t.ulez}</span><b>{ulezText(u, lang)}</b><small>{u.basis}</small></div>; })()}
             </div>
             <p className="muted small">{t.ulezNote}</p>
+            <div className="recall noprint">
+              <h3>{t.congTitle}</h3>
+              <p className="muted">{t.congText}</p>
+              <a className="chip link" href={TFL_URL} target="_blank" rel="noopener noreferrer">{t.tflBtn}</a>
+            </div>
+            {(() => { const b = taxBand(v); if (b.kind === "unknown") return null;
+              return <div className="cdBox na" style={{ margin: "12px 0" }}><span>{t.taxBand}</span><b>{b.kind === "band" ? `${b.band}` : t.flat}</b><small>{t.bandNote} <a className="link" href={TAX_RATES_URL} target="_blank" rel="noopener noreferrer">{t.taxLink}</a></small></div>; })()}
 
             <div className="grid">
               <Info k={t.make} v={v.make} /><Info k={t.model} v={v.model} /><Info k={t.year} v={v.year} /><Info k={t.colour} v={v.colour} />
@@ -125,16 +147,7 @@ export default function App({ sample = false }: { sample?: boolean }) {
             <h3>{t.mileage}</h3>
             <MileageChart tests={v.tests} />
 
-            <h3>{t.motHistory}</h3>
-            {v.tests.length === 0 && <p className="muted">{t.noTests}</p>}
-            <ul className="tests">
-              {[...v.tests].sort((a, b) => b.date.localeCompare(a.date)).map((x, i) => (
-                <li key={i}>
-                  <div className="row"><b>{x.date}</b><span className={/fail/i.test(x.result) ? "tag bad" : "tag ok"}>{/fail/i.test(x.result) ? t.failed : t.passed}</span><span className="muted">{x.mileage != null ? `${x.mileage.toLocaleString("en-GB")} ${x.unit}` : "-"}</span></div>
-                  {x.defects.length > 0 && <ul className="def">{x.defects.map((d, j) => <li key={j}><i>{d.type}</i> {d.text}</li>)}</ul>}
-                </li>
-              ))}
-            </ul>
+            <MotHistory v={v} t={t} />
 
             <div className="paid noprint">
               <h3>{t.paid}</h3>
@@ -144,8 +157,13 @@ export default function App({ sample = false }: { sample?: boolean }) {
           </section>
         )}
 
-        {!v && !sample && state !== "loading" && (
+        {!v && !sample && !motOnly && state !== "loading" && (
           <>
+            <div className="feats noprint">
+              {[<ClipboardCheck key="a" size={22} />, <Gauge key="b" size={22} />, <Leaf key="c" size={22} />].map((ic, i) => (
+                <div key={i} className="feat"><div className="ic">{ic}</div><div><b>{t.feats[i][0]}</b><span className="muted">{t.feats[i][1]}</span></div></div>
+              ))}
+            </div>
             <section className="card noprint">
               <h3>{t.freeTitle}</h3>
               <ul className="ticks">{t.freeList.map((x) => <li key={x}>{x}</li>)}</ul>
@@ -189,7 +207,7 @@ export default function App({ sample = false }: { sample?: boolean }) {
             <details key={q} className="faq"><summary>{q}</summary><p className="muted">{a}</p></details>
           ))}
         </section>
-        <footer className="foot">{t.footer}<div className="legal"><a href="/gizlilik">{t.legalNav[0]}</a><a href="/cerezler">{t.legalNav[1]}</a><a href="/sartlar">{t.legalNav[2]}</a></div></footer>
+        <footer className="foot">{t.footer}<div className="legal"><a href="/mot">{t.more[0]}</a><a href="/sat">{t.more[1]}</a><a href="/blog">{t.more[2]}</a><a href="/destek">{t.more[3]}</a></div><div className="legal"><a href="/gizlilik">{t.legalNav[0]}</a><a href="/cerezler">{t.legalNav[1]}</a><a href="/sartlar">{t.legalNav[2]}</a></div></footer>
       </main>
 
       {showCmp && (
@@ -211,6 +229,23 @@ export default function App({ sample = false }: { sample?: boolean }) {
           </div>
         </div>
       )}
+    </>
+  );
+}
+
+function MotHistory({ v, t }: { v: Vehicle; t: (typeof T)[Lang] }) {
+  return (
+    <>
+      <h3>{t.motHistory}</h3>
+      {v.tests.length === 0 && <p className="muted">{t.noTests}</p>}
+      <ul className="tests">
+        {[...v.tests].sort((a, b) => b.date.localeCompare(a.date)).map((x, i) => (
+          <li key={i}>
+            <div className="row"><b>{x.date}</b><span className={/fail/i.test(x.result) ? "tag bad" : "tag ok"}>{/fail/i.test(x.result) ? t.failed : t.passed}</span><span className="muted">{x.mileage != null ? `${x.mileage.toLocaleString("en-GB")} ${x.unit}` : "-"}</span></div>
+            {x.defects.length > 0 && <ul className="def">{x.defects.map((d, j) => <li key={j}><i>{d.type}</i> {d.text}</li>)}</ul>}
+          </li>
+        ))}
+      </ul>
     </>
   );
 }

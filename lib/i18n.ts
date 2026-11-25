@@ -2,6 +2,7 @@ export type Lang = "tr" | "en";
 export const T = {
   tr: {
     banner: "AHMET KULA TARAFINDAN TASARLANMIŞTIR",
+    feats: [["MOT geçmişi","Tüm testler, uyarılar ve arızalar tek ekranda."],["Kilometre kontrolü","Grafikle tutarsızlıkları kolayca gör."],["Vergi ve ULEZ","Vergi bitişi ve Londra ULEZ uyumu anında."]] as [string,string][],
     title: "UK Araç Kontrol", sub: "Plakayı gir, aracın geçmişini ve risk puanını anında gör.",
     placeholder: "PLAKA: AB12 CDE", check: "Kontrol Et", loading: "Sorgulanıyor…",
     notFound: "Araç bulunamadı. Plakayı kontrol et.", err: "Bir hata oluştu. Tekrar dene.",
@@ -35,10 +36,15 @@ export const T = {
     euro: "Euro standardı", yearly: "Yıllık ortalama", exportSt: "İhracat", v5c: "Son V5C tarihi", typeApp: "Tip onayı", wheelplan: "Tekerlek düzeni", firstReg: "İlk tescil", yes: "Evet", no: "Hayır",
     recallTitle: "Geri çağırma (recall) kontrolü", recallText: "Aracın çözülmemiş bir güvenlik geri çağırması olup olmadığını resmi GOV.UK servisinde plakayla ücretsiz kontrol et. Bu site o servisin parçası değildir.", recallBtn: "GOV.UK'te kontrol et ↗",
     legalNav: ["Gizlilik", "Çerezler", "Şartlar"], back: "← Ana sayfa",
+    taxBand: "Vergi bandı", flat: "Standart oran", bandNote: "CO2'ye göre eski bant sistemi (2001-2017 arası tescilli arabalar). Güncel ücret her yıl değişir.", taxLink: "Güncel vergi ücretleri ↗",
+    congTitle: "Kalabalık bölge (Londra) ücreti", congText: "ULEZ'den ayrıdır. Çoğu araç, ULEZ'e uyumlu olsa bile merkez Londra'da günlük ücret öder. Muafiyet olup olmadığını TfL'in kontrolünde plakayla gör.", tflBtn: "TfL'de kontrol et ↗",
+    motPageTitle: "MOT Kontrolü", motPageSub: "Plakayı gir, sadece MOT durumunu ve geçmişini gör.",
+    more: ["MOT kontrolü", "Aracımı sat", "Blog", "Destek"],
     footer: "Veri: DVLA ve DVSA. Risk puanı bir tahmindir, garanti değildir.",
   },
   en: {
     banner: "DESIGNED BY AHMET KULA",
+    feats: [["MOT history","Every test, advisory and failure on one screen."],["Mileage check","Spot inconsistencies easily with the chart."],["Tax and ULEZ","Tax due date and London ULEZ compliance instantly."]] as [string,string][],
     title: "UK Car Check", sub: "Enter a plate and see the vehicle history and risk score instantly.",
     placeholder: "REG: AB12 CDE", check: "Check", loading: "Looking up…",
     notFound: "Vehicle not found. Check the plate.", err: "Something went wrong. Try again.",
@@ -72,6 +78,10 @@ export const T = {
     euro: "Euro standard", yearly: "Yearly average", exportSt: "Exported", v5c: "Last V5C issued", typeApp: "Type approval", wheelplan: "Wheelplan", firstReg: "First registered", yes: "Yes", no: "No",
     recallTitle: "Safety recall check", recallText: "Check whether this vehicle has an outstanding safety recall on the official GOV.UK service, free, using the registration. This site is not part of that service.", recallBtn: "Check on GOV.UK ↗",
     legalNav: ["Privacy", "Cookies", "Terms"], back: "← Home",
+    taxBand: "Tax band", flat: "Standard rate", bandNote: "Old CO2-based band system (cars registered 2001-2017). Current rates change every year.", taxLink: "Current tax rates ↗",
+    congTitle: "Congestion Charge (London)", congText: "Separate from the ULEZ. Most vehicles pay a daily charge in central London even if ULEZ-compliant. Check for exemptions with TfL's checker using the registration.", tflBtn: "Check on TfL ↗",
+    motPageTitle: "MOT Check", motPageSub: "Enter a plate to see just the MOT status and history.",
+    more: ["MOT check", "Sell my car", "Blog", "Support"],
     footer: "Data: DVLA and DVSA. The risk score is an estimate, not a guarantee.",
   },
 } as const;
