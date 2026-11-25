@@ -76,3 +76,5 @@ th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;overfl
 .ticks.lock li:before{content:"🔒";font-size:12px;left:7px}
 .steps{display:grid;gap:8px}.step{background:#0e1424;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
 @media(max-width:480px){.ticks{grid-template-columns:1fr}}
+.recall{margin-top:8px}.legal{display:flex;gap:14px;justify-content:center;margin-top:10px}.legal a{color:var(--muted);font-size:13px}
+.doc h2{font-size:18px;margin:22px 0 6px}.doc p,.doc li{color:var(--muted);line-height:1.55;font-size:15px}.doc a{color:var(--accent)}

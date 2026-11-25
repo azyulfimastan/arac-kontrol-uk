@@ -52,3 +52,16 @@ export function ulezText(u: Ulez, lang: Lang): string {
   const en = { yes: "Compliant", no: "Not compliant (daily charge)", likely: "Likely compliant", unlikely: "Likely not compliant", unknown: "Unknown" };
   return (lang === "tr" ? tr : en)[u.status];
 }
+
+/** Average yearly mileage from first to last MOT odometer reading (miles or km as recorded). */
+export function yearlyMileage(v: Vehicle): number | null {
+  const pts = v.tests.filter((t) => t.mileage != null).sort((a, b) => a.date.localeCompare(b.date));
+  if (pts.length < 2) return null;
+  const a = pts[0], b = pts[pts.length - 1];
+  const yrs = (new Date(b.date).getTime() - new Date(a.date).getTime()) / 31557600000;
+  if (yrs < 0.5) return null;
+  const per = (b.mileage! - a.mileage!) / yrs;
+  return per > 0 ? Math.round(per) : null;
+}
+
+export const RECALL_URL = "https://www.gov.uk/check-vehicle-recall";

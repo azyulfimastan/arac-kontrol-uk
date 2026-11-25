@@ -32,6 +32,9 @@ export const T = {
     fullText: "Ciddi bir alıcıysan bu bilgiler ücretsiz resmi kaynaklarda yok ve lisanslı veri sağlayıcılardan alınır:",
     fullList: ["Üzerinde finans (kredi) borcu var mı", "Çalıntı olarak kayıtlı mı", "Sigorta hasar (write-off) kaydı", "Önceki sahip sayısı ve plaka geçmişi"],
     sampleTitle: "Örnek rapor", sampleNote: "Bu sayfa uydurma örnek veri gösterir, gerçek bir araç değildir.",
+    euro: "Euro standardı", yearly: "Yıllık ortalama", exportSt: "İhracat", v5c: "Son V5C tarihi", typeApp: "Tip onayı", wheelplan: "Tekerlek düzeni", firstReg: "İlk tescil", yes: "Evet", no: "Hayır",
+    recallTitle: "Geri çağırma (recall) kontrolü", recallText: "Aracın çözülmemiş bir güvenlik geri çağırması olup olmadığını resmi GOV.UK servisinde plakayla ücretsiz kontrol et. Bu site o servisin parçası değildir.", recallBtn: "GOV.UK'te kontrol et ↗",
+    legalNav: ["Gizlilik", "Çerezler", "Şartlar"], back: "← Ana sayfa",
     footer: "Veri: DVLA ve DVSA. Risk puanı bir tahmindir, garanti değildir.",
   },
   en: {
@@ -66,6 +69,9 @@ export const T = {
     fullText: "If you are a serious buyer, this information is not in free official sources and comes from licensed data providers:",
     fullList: ["Outstanding finance on the car", "Recorded as stolen", "Insurance write-off record", "Previous owners and plate history"],
     sampleTitle: "Sample report", sampleNote: "This page shows made-up sample data, not a real vehicle.",
+    euro: "Euro standard", yearly: "Yearly average", exportSt: "Exported", v5c: "Last V5C issued", typeApp: "Type approval", wheelplan: "Wheelplan", firstReg: "First registered", yes: "Yes", no: "No",
+    recallTitle: "Safety recall check", recallText: "Check whether this vehicle has an outstanding safety recall on the official GOV.UK service, free, using the registration. This site is not part of that service.", recallBtn: "Check on GOV.UK ↗",
+    legalNav: ["Privacy", "Cookies", "Terms"], back: "← Home",
     footer: "Data: DVLA and DVSA. The risk score is an estimate, not a guarantee.",
   },
 } as const;

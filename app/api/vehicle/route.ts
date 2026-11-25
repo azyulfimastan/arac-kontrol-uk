@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
     const v: Vehicle = {
       reg, make: dv.make || "", model, colour: dv.colour || "", fuel: dv.fuelType || "", engineCc: dv.engineCapacity ?? null,
       year: dv.yearOfManufacture ?? null, co2: dv.co2Emissions ?? null, taxStatus: dv.taxStatus || "", taxDue: dv.taxDueDate || null,
-      motStatus: dv.motStatus || "", motExpiry: dv.motExpiryDate || null, euroStatus: dv.euroStatus || null, firstReg: dv.monthOfFirstRegistration || null, tests, demo: false,
+      motStatus: dv.motStatus || "", motExpiry: dv.motExpiryDate || null, euroStatus: dv.euroStatus || null, firstReg: dv.monthOfFirstRegistration || null, exported: dv.markedForExport ?? null, v5c: dv.dateOfLastV5CIssued || null, typeApproval: dv.typeApproval || null, wheelplan: dv.wheelplan || null, tests, demo: false,
     };
     return NextResponse.json(v);
   } catch {

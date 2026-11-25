@@ -4,7 +4,7 @@ import { T, Lang } from "@/lib/i18n";
 import { computeRisk } from "@/lib/risk";
 import type { Vehicle } from "@/lib/types";
 import MileageChart from "./MileageChart";
-import { countdown, countdownText, ulez, ulezText } from "@/lib/extras";
+import { countdown, countdownText, ulez, ulezText, yearlyMileage, RECALL_URL } from "@/lib/extras";
 
 const PAID = [
   { n: "HPI Check", u: "https://www.hpicheck.com/" },
@@ -105,12 +105,21 @@ export default function App({ sample = false }: { sample?: boolean }) {
             <div className="grid">
               <Info k={t.make} v={v.make} /><Info k={t.model} v={v.model} /><Info k={t.year} v={v.year} /><Info k={t.colour} v={v.colour} />
               <Info k={t.fuel} v={v.fuel} /><Info k={t.engine} v={v.engineCc} /><Info k={t.tax} v={v.taxStatus} /><Info k={t.mot} v={v.motStatus} />
-              <Info k={t.motExp} v={v.motExpiry} /><Info k={t.taxDue} v={v.taxDue} /><Info k={t.co2} v={v.co2} />
+              <Info k={t.motExp} v={v.motExpiry} /><Info k={t.taxDue} v={v.taxDue} /><Info k={t.co2} v={v.co2} /><Info k={t.euro} v={v.euroStatus ?? null} />
+              <Info k={t.yearly} v={(() => { const y = yearlyMileage(v); const u = v.tests.find((x) => x.mileage != null)?.unit ?? "mi"; return y ? `${y.toLocaleString("en-GB")} ${u}` : null; })()} /><Info k={t.firstReg} v={v.firstReg ?? null} />
+              <Info k={t.exportSt} v={v.exported == null ? null : v.exported ? t.yes : t.no} /><Info k={t.v5c} v={v.v5c ?? null} />
+              <Info k={t.typeApp} v={v.typeApproval ?? null} /><Info k={t.wheelplan} v={v.wheelplan ?? null} />
             </div>
 
             <div className="actions noprint">
               <button onClick={toggleFav}>{isFav ? "★ " + t.saved : "☆ " + t.save}</button>
               <button className="ghost" onClick={() => window.print()}>⬇ {t.pdf}</button>
+            </div>
+
+            <div className="recall noprint">
+              <h3>{t.recallTitle}</h3>
+              <p className="muted">{t.recallText}</p>
+              <a className="chip link" href={RECALL_URL} target="_blank" rel="noopener noreferrer">{t.recallBtn}</a>
             </div>
 
             <h3>{t.mileage}</h3>
@@ -180,7 +189,7 @@ export default function App({ sample = false }: { sample?: boolean }) {
             <details key={q} className="faq"><summary>{q}</summary><p className="muted">{a}</p></details>
           ))}
         </section>
-        <footer className="foot">{t.footer}</footer>
+        <footer className="foot">{t.footer}<div className="legal"><a href="/gizlilik">{t.legalNav[0]}</a><a href="/cerezler">{t.legalNav[1]}</a><a href="/sartlar">{t.legalNav[2]}</a></div></footer>
       </main>
 
       {showCmp && (
